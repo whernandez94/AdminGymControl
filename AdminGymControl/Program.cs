@@ -1,13 +1,23 @@
+using AdminGymControl.Data;
+using AdminGymControl.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace AdminGymControl
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Add services
+            builder.Services.AddScoped<IMemberService, MemberService>();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
