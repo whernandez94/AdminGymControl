@@ -1,63 +1,46 @@
-﻿@model List<Member>
+﻿@model List<MembershipPlan>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Lista de miembros</h1>
+    <h1 class="mb-4">Planes de Membresía</h1>
 
     <div class="d-flex justify-content-between mb-3">
         <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Agregar nuevo miembro
+            <i class="bi bi-plus-circle"></i> Nuevo Plan
         </a>
     </div>
 
     <div class="table-responsive">
-        <table id="membersTable" class="table-striped table-hover table">
+        <table class="table-striped table-hover table">
             <thead class="table-dark">
                 <tr>
-                    <th>#</th>
-                    <th>Nombre completo</th>
-                    <th>Correo</th>
-                    <th>Plan</th>
-                    <th>Fecha de suscripción</th>
-                    <th>Días como miembro</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var member in Model)
+                @foreach (var plan in Model)
                 {
                     <tr>
-                        <td>@member.Id</td>
-                        <td>@member.FullName</td>
-                        <td>
-                            <a href="mailto:@member.Email">@member.Email</a>
-                        </td>
-                        <td>
-                            @if (member.MembershipPlan != null)
-                            {
-                                <span class="badge bg-primary" title="@member.MembershipPlan.Description">
-                                    @member.MembershipPlan.Name
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Sin plan</span>
-                            }
-                        </td>
-                        <td>@member.JoinDate.ToString("dd/MM/yyyy")</td>
-                        <td>@((DateTime.Now - member.JoinDate).TotalDays.ToString("N0")) días</td>
+                        <td>@plan.Name</td>
+                        <td>@(string.IsNullOrEmpty(plan.Description) ? "N/A" : plan.Description)</td>
+                        <td>@plan.Price.ToString("C")</td>
+                        <td>@plan.DurationInDays días</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a asp-action="Edit" asp-route-id="@member.Id"
+                                <a asp-action="Edit" asp-route-id="@plan.Id"
                                    class="btn btn-sm btn-warning" title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                                 <button class="btn btn-sm btn-danger delete-btn"
-                                        data-id="@member.Id" title="Eliminar">
+                                        data-id="@plan.Id" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
-                                <a asp-action="Details" asp-route-id="@member.Id"
+                                <a asp-action="Details" asp-route-id="@plan.Id"
                                    class="btn btn-sm btn-info" title="Detalles">
-                                    <i class="bi bi-eye"></i>
+                                    <i class="bi bi-people"></i>
                                 </a>
                             </div>
                         </td>
@@ -68,18 +51,17 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
                 $(document).ready(function() {
             $(document).on('click', '.delete-btn', function() {
                 const id = $(this).data('id');
                 const row = $(this).closest('tr');
-                const memberName = row.find('td:nth-child(2)').text();
+                const planName = row.find('td:first').text();
 
                 Swal.fire({
-                    title: '¿Eliminar miembro?',
-                    html: `¿Estás seguro de eliminar a <b>${memberName}</b>?<br>Esta acción no se puede deshacer.`,
+                    title: '¿Eliminar plan?',
+                    html: `¿Estás seguro de eliminar el plan <b>${planName}</b>?<br>Esta acción no se puede deshacer.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -89,7 +71,7 @@
                     reverseButtons: true,
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
-                        return fetch(`@Url.Action("Delete", "Members")/${id}`, {
+                        return fetch(`@Url.Action("Delete", "MembershipPlans")/${id}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -111,11 +93,6 @@
                         if (result.value && result.value.success) {
                             row.fadeOut(400, () => row.remove());
                             Swal.fire('¡Eliminado!', result.value.message, 'success');
-
-                           
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1500);
                         } else {
                             Swal.fire('¡Error!', result.value?.message || 'Error desconocido', 'error');
                         }

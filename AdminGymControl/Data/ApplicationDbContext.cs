@@ -21,14 +21,15 @@ namespace AdminGymControl.Data
                 .HasKey(mc => new { mc.MemberId, mc.ClassSessionId });
 
             modelBuilder.Entity<MemberClass>()
-                .HasOne(mc => mc.Member)
-                .WithMany(m => m.MemberClasses)
-                .HasForeignKey(mc => mc.MemberId);
-
-            modelBuilder.Entity<MemberClass>()
                 .HasOne(mc => mc.ClassSession)
                 .WithMany(c => c.MemberClasses)
                 .HasForeignKey(mc => mc.ClassSessionId);
+
+            modelBuilder.Entity<Member>()
+        .HasOne(m => m.MembershipPlan)
+        .WithMany()
+        .HasForeignKey(m => m.MembershipPlanId)
+        .OnDelete(DeleteBehavior.SetNull);
         }
 
 
