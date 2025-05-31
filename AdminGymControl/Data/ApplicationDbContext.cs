@@ -8,6 +8,30 @@ namespace AdminGymControl.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Member> Members { get; set; }
+        public DbSet<MembershipPlan> MembershipPlans { get; set; }
+        public DbSet<Trainer> Trainers { get; set; }
+        public DbSet<ClassSession> ClassSessions { get; set; }
+        public DbSet<MemberClass> MemberClasses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<MemberClass>()
+                .HasKey(mc => new { mc.MemberId, mc.ClassSessionId });
+
+            modelBuilder.Entity<MemberClass>()
+                .HasOne(mc => mc.Member)
+                .WithMany(m => m.MemberClasses)
+                .HasForeignKey(mc => mc.MemberId);
+
+            modelBuilder.Entity<MemberClass>()
+                .HasOne(mc => mc.ClassSession)
+                .WithMany(c => c.MemberClasses)
+                .HasForeignKey(mc => mc.ClassSessionId);
+        }
+
+
     }
 
 }

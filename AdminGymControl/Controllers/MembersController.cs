@@ -15,7 +15,14 @@ namespace AdminGymControl.Controllers
 
         public async Task<IActionResult> Index() => View(await _service.GetAllAsync());
 
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            var model = new Member
+            {
+                JoinDate = DateTime.Today // Valor por defecto
+            };
+            return View(model);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create(Member member)
@@ -45,17 +52,18 @@ namespace AdminGymControl.Controllers
             return View(member);
         }
 
-        public async Task<IActionResult> Delete(int id)
-        {
-            var member = await _service.GetByIdAsync(id);
-            return member == null ? NotFound() : View(member);
-        }
-
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _service.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _service.DeleteAsync(id);
+                return Json(new { success = true, message = "Miembro eliminado exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 

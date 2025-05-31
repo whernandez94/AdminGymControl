@@ -19,8 +19,17 @@ namespace AdminGymControl.Services
 
         public async Task AddAsync(Member member)
         {
-            _context.Members.Add(member);
-            await _context.SaveChangesAsync();
+            try
+            {
+                member.JoinDate = DateTime.Now; // Set current date if not set
+                _context.Members.Add(member);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log error
+                throw new ApplicationException("Error saving member", ex);
+            }
         }
 
         public async Task UpdateAsync(Member member)
@@ -34,8 +43,16 @@ namespace AdminGymControl.Services
             var member = await _context.Members.FindAsync(id);
             if (member != null)
             {
-                _context.Members.Remove(member);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Members.Remove(member);
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Log del error si es necesario
+                    throw new Exception("Error deleting member: " + ex.Message);
+                }
             }
         }
     }
