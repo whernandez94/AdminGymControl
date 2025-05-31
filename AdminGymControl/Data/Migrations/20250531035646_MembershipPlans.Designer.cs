@@ -4,6 +4,7 @@ using AdminGymControl.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdminGymControl.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250531035646_MembershipPlans")]
+    partial class MembershipPlans
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,18 +63,16 @@ namespace AdminGymControl.Data.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MembershipPlanId")
+                    b.Property<int>("MembershipPlanId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -106,16 +107,14 @@ namespace AdminGymControl.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DurationInDays")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -164,9 +163,10 @@ namespace AdminGymControl.Data.Migrations
             modelBuilder.Entity("AdminGymControl.Models.Member", b =>
                 {
                     b.HasOne("AdminGymControl.Models.MembershipPlan", "MembershipPlan")
-                        .WithMany()
+                        .WithMany("Members")
                         .HasForeignKey("MembershipPlanId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("MembershipPlan");
                 });
@@ -180,7 +180,7 @@ namespace AdminGymControl.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("AdminGymControl.Models.Member", "Member")
-                        .WithMany()
+                        .WithMany("MemberClasses")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -193,6 +193,16 @@ namespace AdminGymControl.Data.Migrations
             modelBuilder.Entity("AdminGymControl.Models.ClassSession", b =>
                 {
                     b.Navigation("MemberClasses");
+                });
+
+            modelBuilder.Entity("AdminGymControl.Models.Member", b =>
+                {
+                    b.Navigation("MemberClasses");
+                });
+
+            modelBuilder.Entity("AdminGymControl.Models.MembershipPlan", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("AdminGymControl.Models.Trainer", b =>

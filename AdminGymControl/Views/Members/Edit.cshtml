@@ -1,0 +1,120 @@
+﻿@model Member
+
+<div class="container mt-5">
+    <h1>@(Model.Id == 0 ? "Agregar nuevo miembro" : "Editar miembro")</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @if (Model.Id != 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="Nombre completo" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="JoinDate" class="form-label"></label>
+                            <input asp-for="JoinDate" type="date" class="form-control" />
+                            <span asp-validation-for="JoinDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="MembershipPlanId" class="form-label"></label>
+                            <select asp-for="MembershipPlanId" asp-items="ViewBag.MembershipPlans" class="form-select">
+                                <option value="">-- Seleccione un plan --</option>
+                            </select>
+                            <span asp-validation-for="MembershipPlanId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Planes disponibles</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.PlansInfo != null)
+                    {
+                        foreach (var plan in ViewBag.PlansInfo as List<MembershipPlan>)
+                        {
+                            <div class="mb-3">
+                                <h6>@plan.Name</h6>
+                                <p class="small mb-1">@plan.Description</p>
+                                <p class="small text-muted mb-0">
+                                    <strong>Precio:</strong> @plan.Price.ToString("C") |
+                                    <strong>Duración:</strong> @plan.DurationInDays días
+                                </p>
+                            </div>
+                            <hr class="my-2">
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay planes disponibles</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            
+        @if (Model.Id == 0)
+        {
+            <text>
+                    var today = new Date().toISOString().split('T')[0];
+                    document.getElementById("JoinDate").value = today;
+            </text>
+        }
+
+            
+            $('#MembershipPlanId').select2({
+                placeholder: "Seleccione un plan",
+                allowClear: true
+            });
+        });
+    </script>
+
+   
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+}

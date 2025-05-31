@@ -16,6 +16,7 @@ namespace AdminGymControl
 
             // Add services
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<IMembershipPlanService, MembershipPlanService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
